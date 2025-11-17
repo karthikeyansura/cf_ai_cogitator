@@ -1,7 +1,7 @@
 # AI Chat Agent – Cogitator
 
 <a href="https://cogitator.karthikeyansura.workers.dev">
-  <img src="https://deploy.workers.cloudflare.com/button" alt="Live Deployment"/>
+  <img src="assets/deployment-button.svg" alt="Deployment"/>
 </a>
 
 A full-stack AI chat agent built on the Cloudflare Agents platform. This project extends the official `cloudflare/agents-starter` template and is configured to run on **Cloudflare Workers AI (Llama 3)**.
@@ -25,7 +25,7 @@ Cogitator provides a lightweight, fully serverless chat system with tool executi
 - Real-time streaming responses
 - Persistent chat history and agent state
 
-## Live Demo
+## Production
 
 The deployed application is available at:  
 https://cogitator.karthikeyansura.workers.dev
@@ -36,3 +36,4 @@ https://cogitator.karthikeyansura.workers.dev
    ```bash
    git clone https://github.com/karthikeyansura/cf_ai_cogitator.git
    cd cf_ai_cogitator
+   ```
