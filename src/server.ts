@@ -13,17 +13,11 @@ import {
   createUIMessageStreamResponse,
   type ToolSet
 } from "ai";
-import { openai } from "@ai-sdk/openai";
+// Import the Workers AI provider
+import { createWorkersAI } from 'workers-ai-provider';
 import { processToolCalls, cleanupMessages } from "./utils";
 import { tools, executions } from "./tools";
 // import { env } from "cloudflare:workers";
-
-const model = openai("gpt-4o-2024-11-20");
-// Cloudflare AI Gateway
-// const openai = createOpenAI({
-//   apiKey: env.OPENAI_API_KEY,
-//   baseURL: env.GATEWAY_BASE_URL,
-// });
 
 /**
  * Chat Agent implementation that handles real-time AI chat interactions
@@ -36,9 +30,10 @@ export class Chat extends AIChatAgent<Env> {
     onFinish: StreamTextOnFinishCallback<ToolSet>,
     _options?: { abortSignal?: AbortSignal }
   ) {
-    // const mcpConnection = await this.mcp.connect(
-    //   "https://path-to-mcp-server/sse"
-    // );
+    // Create the Workers AI instance *inside* the method to access this.env
+    const workersai = createWorkersAI({ binding: this.env.AI });
+    // Use Llama 3
+    const model = workersai("@cf/meta/llama-3-8b-instruct");
 
     // Collect all tools, including MCP tools
     const allTools = {
@@ -69,7 +64,7 @@ If the user asks to schedule a task, use the schedule tool to schedule the task.
 `,
 
           messages: convertToModelMessages(processedMessages),
-          model,
+          model, // This now uses Llama 3
           tools: allTools,
           // Type boundary: streamText expects specific tool types, but base class uses ToolSet
           // This is safe because our tools satisfy ToolSet interface (verified by 'satisfies' in tools.ts)
@@ -110,19 +105,7 @@ If the user asks to schedule a task, use the schedule tool to schedule the task.
  */
 export default {
   async fetch(request: Request, env: Env, _ctx: ExecutionContext) {
-    const url = new URL(request.url);
-
-    if (url.pathname === "/check-open-ai-key") {
-      const hasOpenAIKey = !!process.env.OPENAI_API_KEY;
-      return Response.json({
-        success: hasOpenAIKey
-      });
-    }
-    if (!process.env.OPENAI_API_KEY) {
-      console.error(
-        "OPENAI_API_KEY is not set, don't forget to set it locally in .dev.vars, and use `wrangler secret bulk .dev.vars` to upload it to production"
-      );
-    }
+    // We removed the OpenAI key check, as it's no longer needed.
     return (
       // Route the request to our agent or return 404 if not found
       (await routeAgentRequest(request, env)) ||
