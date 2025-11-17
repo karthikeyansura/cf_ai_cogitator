@@ -14,7 +14,7 @@ import {
   type ToolSet
 } from "ai";
 // Import the Workers AI provider
-import { createWorkersAI } from 'workers-ai-provider';
+import { createWorkersAI } from "workers-ai-provider";
 import { processToolCalls, cleanupMessages } from "./utils";
 import { tools, executions } from "./tools";
 // import { env } from "cloudflare:workers";
